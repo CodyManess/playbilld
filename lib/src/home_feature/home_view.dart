@@ -12,7 +12,7 @@ class HomeView extends StatelessWidget {
 
   Widget _buildHorizontalListView(BuildContext context) {
     return SizedBox(
-      height: 200,
+      height: 260, // Adjusted height for 240px card + 10px top/bottom padding
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: mockShows.length,
@@ -28,7 +28,7 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sample Items'),
+        title: const Text('Playbilld'), // Changed AppBar title
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
@@ -43,13 +43,38 @@ class HomeView extends StatelessWidget {
       ),
 
       body: SingleChildScrollView(
-        child: Column ( 
-          children: [
-            Text('Testing 12345'),
-            _buildHorizontalListView(context),
-            _buildHorizontalListView(context),
-            _buildHorizontalListView(context)
-          ]
+        child: Padding( // Added padding around the scroll view's content
+          padding: const EdgeInsets.all(12.0),
+          child: Column (
+            crossAxisAlignment: CrossAxisAlignment.start, // Align titles to the left
+            children: [
+              // Section 1
+              Text(
+                'New Musicals',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 8.0),
+              _buildHorizontalListView(context),
+              const SizedBox(height: 16.0), // Spacing between sections
+
+              // Section 2
+              Text(
+                'Upcoming Shows',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 8.0),
+              _buildHorizontalListView(context),
+              const SizedBox(height: 16.0),
+
+              // Section 3
+              Text(
+                'Popular Near You',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 8.0),
+              _buildHorizontalListView(context),
+            ],
+          ),
         )
       )
     );

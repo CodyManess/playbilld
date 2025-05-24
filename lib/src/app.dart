@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'package:flutter_application/src/models/show.dart';
 import 'shared/show_detail_view.dart';
 import 'home_feature/home_view.dart';
 import 'settings/settings_controller.dart';
@@ -70,7 +71,13 @@ class MyApp extends StatelessWidget {
                   case SettingsView.routeName:
                     return SettingsView(controller: settingsController);
                   case ShowDetailView.routeName:
-                    return const ShowDetailView();
+                    final show = routeSettings.arguments as Show;
+                    return MaterialPageRoute<void>(
+                      settings: routeSettings,
+                      builder: (BuildContext context) {
+                        return ShowDetailView(show: show);
+                      },
+                    );
                   case HomeView.routeName:
                   default:
                     return HomeView();

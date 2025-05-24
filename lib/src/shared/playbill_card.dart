@@ -12,13 +12,14 @@ class ShowPosterCard extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         // Handle card click here, e.g., navigate to show details
-        Navigator.pushNamed(context, ShowDetailView.routeName,);
+        Navigator.pushNamed(context, ShowDetailView.routeName, arguments: show);
       },
       child: Card(
         clipBehavior: Clip.antiAlias, // Prevents image from overflowing card edges
+        elevation: 2.0,
         child: SizedBox(
-          width: 150, // Set the desired width (or use constraints)
-          height: 50, // Set the desired height (or use constraints)
+          width: 160, // Adjusted width
+          height: 240, // Adjusted height
           child: Image.network(
             show.posterImageUrl,
             fit: BoxFit.cover, // Ensures the image covers the entire card
