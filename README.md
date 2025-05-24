@@ -2,6 +2,8 @@
 
 A little project idea that is supposed to be letterboxd for broadway performances.
 
+This app is composed of 4 main screens that are accessible through the bottom tab bar
+
 ## Getting Started
 
 This project is a starting point for a Flutter application that follows the
