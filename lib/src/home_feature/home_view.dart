@@ -13,6 +13,7 @@ class HomeView extends StatelessWidget {
   Widget _buildHorizontalListView(BuildContext context) {
     return SizedBox(
       height: 260, // Adjusted height for 240px card + 10px top/bottom padding
+      width: double.infinity, // Add this line
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: mockShows.length,
