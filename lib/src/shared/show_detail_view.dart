@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter_application/src/models/show.dart';
+import '../models/show.dart';
 
 /// Displays detailed information about a SampleItem.
 class ShowDetailView extends StatelessWidget {
