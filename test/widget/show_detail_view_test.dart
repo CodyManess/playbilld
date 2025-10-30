@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_application/src/models/show.dart';
-import 'package:flutter_application/src/shared/show_detail_view.dart';
+import 'package:playbilld/src/models/show.dart';
+import 'package:playbilld/src/shared/show_detail_view.dart';
 
 void main() {
   final mockShow = Show(
@@ -25,23 +25,18 @@ void main() {
 
     // Verify description
     expect(find.text('A truly awesome musical.'), findsOneWidget);
-    expect(find.text('Description:'), findsOneWidget);
 
+    // Verify genre in ListTile
+    expect(find.widgetWithText(ListTile, 'Musical Theatre'), findsOneWidget);
 
-    // Verify genre
-    expect(find.text('Genre: Musical Theatre'), findsOneWidget);
+    // Verify cast in ListTile
+    expect(find.widgetWithText(ListTile, 'Actor A, Actress B'), findsOneWidget);
 
-    // Verify cast
-    expect(find.text('Cast:'), findsOneWidget);
-    expect(find.text('Actor A, Actress B'), findsOneWidget);
+    // Verify dates in ListTile
+    expect(find.widgetWithText(ListTile, '2024-01-01 - 2024-12-31'), findsOneWidget);
 
-    // Verify dates
-    expect(find.text('Show Dates:'), findsOneWidget);
-    expect(find.text('Start Date: 2024-01-01'), findsOneWidget);
-    expect(find.text('End Date: 2024-12-31'), findsOneWidget);
-
-    // Verify rating
-    expect(find.text('Average Rating: 9.5/10'), findsOneWidget);
+    // Verify rating in ListTile
+    expect(find.widgetWithText(ListTile, '9.5/10'), findsOneWidget);
 
     // Verify Image.network
     expect(find.byType(Image), findsOneWidget); // Checks for Image widget
