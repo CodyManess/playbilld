@@ -14,12 +14,10 @@ const ColorScheme colorScheme = ColorScheme(
   secondary: secondaryColor,
   secondaryContainer: secondaryVariantColor,
   surface: surfaceColor,
-  background: backgroundColor,
   error: errorColor,
   onPrimary: Colors.white,
   onSecondary: Colors.black,
   onSurface: Colors.black,
-  onBackground: Colors.black,
   onError: Colors.white,
   brightness: Brightness.light,
 );
