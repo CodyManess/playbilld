@@ -76,7 +76,7 @@ class MyApp extends StatelessWidget {
                     return ShowDetailView(show: show);
                   case HomeView.routeName:
                   default:
-                    return HomeView();
+                    return const HomeView();
                 }
               },
             );

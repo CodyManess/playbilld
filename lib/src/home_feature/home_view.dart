@@ -22,12 +22,12 @@ class HomeView extends StatelessWidget {
           ),
         ],
       ),
-      body: SingleChildScrollView(
+      body: const SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: EdgeInsets.all(12.0),
           child: Column (
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children: [
               HomeSection(title: 'New Musicals'),
               HomeSection(title: 'Upcoming Shows'),
               HomeSection(title: 'Popular Near You'),
