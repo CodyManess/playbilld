@@ -7,20 +7,24 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.6.2
+  sdk: '>=3.4.3 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_gen: ^5.10.0
+    version: ^0.0.0
+  flutter_gen: ^5.9.0
   flutter_localizations:
     sdk: flutter
+    version: ^0.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+    version: ^0.0.0
+  network_image_mock: ^2.1.1
 
-  flutter_lints: ^5.0.0
+  flutter_lints: ^4.0.0
 
 flutter:
   uses-material-design: true

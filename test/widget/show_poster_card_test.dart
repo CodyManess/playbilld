@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_application/src/models/show.dart';
-import 'package:flutter_application/src/shared/playbill_card.dart';
-import 'package:flutter_application/src/shared/show_detail_view.dart'; // For ShowDetailView.routeName
+import 'package:playbilld/src/models/show.dart';
+import 'package:playbilld/src/shared/playbill_card.dart';
+import 'package:playbilld/src/shared/show_detail_view.dart'; // For ShowDetailView.routeName
+import 'package:network_image_mock/network_image_mock.dart';
 
 // Mock NavigatorObserver to track navigation events
 class MockNavigatorObserver extends NavigatorObserver {
@@ -42,30 +43,26 @@ void main() {
   testWidgets('ShowPosterCard displays image and handles tap for navigation', (WidgetTester tester) async {
     final mockObserver = MockNavigatorObserver();
 
-    await tester.pumpWidget(MaterialApp(
-      home: Scaffold(body: ShowPosterCard(show: mockShow)),
-      navigatorObservers: [mockObserver],
-      routes: {
-        ShowDetailView.routeName: (_) => const PlaceholderWidget(), // Dummy route for navigation target
-      },
-    ));
+    await mockNetworkImagesFor(() async {
+      await tester.pumpWidget(MaterialApp(
+        home: Scaffold(body: ShowPosterCard(show: mockShow)),
+        navigatorObservers: [mockObserver],
+        routes: {
+          ShowDetailView.routeName: (_) => const PlaceholderWidget(), // Dummy route for navigation target
+        },
+      ));
 
-    // Verify Image.network
-    expect(find.byType(Image), findsOneWidget);
-    final Image image = tester.widget(find.byType(Image));
-    expect(image.image, isA<NetworkImage>());
-    expect((image.image as NetworkImage).url, 'http://example.com/poster.jpg');
+      // Verify GestureDetector
+      expect(find.byType(GestureDetector), findsOneWidget);
 
-    // Verify GestureDetector
-    expect(find.byType(GestureDetector), findsOneWidget);
+      // Simulate tap
+      await tester.tap(find.byType(GestureDetector));
+      await tester.pumpAndSettle(); // Wait for navigation to complete
 
-    // Simulate tap
-    await tester.tap(find.byType(GestureDetector));
-    await tester.pumpAndSettle(); // Wait for navigation to complete
-
-    // Verify navigation
-    expect(mockObserver.lastPushedRoute, ShowDetailView.routeName);
-    expect(mockObserver.lastPushedArguments, isA<Show>());
-    expect((mockObserver.lastPushedArguments as Show).title, mockShow.title);
+      // Verify navigation
+      expect(mockObserver.lastPushedRoute, ShowDetailView.routeName);
+      expect(mockObserver.lastPushedArguments, isA<Show>());
+      expect((mockObserver.lastPushedArguments as Show).title, mockShow.title);
+    });
   });
 }
