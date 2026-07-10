@@ -1,32 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:playbilld/src/models/show.dart';
 import 'package:playbilld/src/shared/playbill_card.dart';
-import 'package:playbilld/src/shared/show_detail_view.dart'; // For ShowDetailView.routeName
 import 'package:network_image_mock/network_image_mock.dart';
-
-// Mock NavigatorObserver to track navigation events
-class MockNavigatorObserver extends NavigatorObserver {
-  String? lastPushedRoute;
-  Object? lastPushedArguments;
-
-  @override
-  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    lastPushedRoute = route.settings.name;
-    lastPushedArguments = route.settings.arguments;
-    super.didPush(route, previousRoute);
-  }
-}
-
-// A simple placeholder widget to use for mocked routes
-class PlaceholderWidget extends StatelessWidget {
-  const PlaceholderWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: Text('Placeholder')));
-  }
-}
 
 void main() {
   final mockShow = Show(
@@ -41,15 +18,26 @@ void main() {
   );
 
   testWidgets('ShowPosterCard displays image and handles tap for navigation', (WidgetTester tester) async {
-    final mockObserver = MockNavigatorObserver();
+    final router = GoRouter(
+      initialLocation: '/',
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (context, state) => Scaffold(body: ShowPosterCard(show: mockShow)),
+        ),
+        GoRoute(
+          path: '/show_details',
+          builder: (context, state) {
+            final show = state.extra as Show;
+            return Scaffold(body: Text('Show Details: ${show.title}'));
+          },
+        ),
+      ],
+    );
 
     await mockNetworkImagesFor(() async {
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(body: ShowPosterCard(show: mockShow)),
-        navigatorObservers: [mockObserver],
-        routes: {
-          ShowDetailView.routeName: (_) => const PlaceholderWidget(), // Dummy route for navigation target
-        },
+      await tester.pumpWidget(MaterialApp.router(
+        routerConfig: router,
       ));
 
       // Verify GestureDetector
@@ -59,10 +47,8 @@ void main() {
       await tester.tap(find.byType(GestureDetector));
       await tester.pumpAndSettle(); // Wait for navigation to complete
 
-      // Verify navigation
-      expect(mockObserver.lastPushedRoute, ShowDetailView.routeName);
-      expect(mockObserver.lastPushedArguments, isA<Show>());
-      expect((mockObserver.lastPushedArguments as Show).title, mockShow.title);
+      // Verify navigation occurred
+      expect(find.text('Show Details: ${mockShow.title}'), findsOneWidget);
     });
   });
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:playbilld/src/shared/show_detail_view.dart';
+import 'package:go_router/go_router.dart';
 import 'package:playbilld/src/models/show.dart';
 
 class ShowPosterCard extends StatelessWidget {
@@ -12,7 +12,7 @@ class ShowPosterCard extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         // Handle card click here, e.g., navigate to show details
-        Navigator.pushNamed(context, ShowDetailView.routeName, arguments: show);
+        context.push('/show_details', extra: show);
       },
       child: Card(
         clipBehavior: Clip.antiAlias, // Prevents image from overflowing card edges

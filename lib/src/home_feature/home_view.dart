@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:playbilld/src/home_feature/home_section.dart';
-import '../settings/settings_view.dart';
 
 class HomeView extends StatelessWidget {
 
@@ -17,7 +17,7 @@ class HomeView extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              Navigator.restorablePushNamed(context, SettingsView.routeName);
+              context.go('/settings');
             },
           ),
         ],

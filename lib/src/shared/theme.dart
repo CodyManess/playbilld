@@ -30,7 +30,7 @@ final ThemeData appTheme = ThemeData(
     backgroundColor: primaryColor,
     elevation: 4.0,
   ),
-  cardTheme: CardTheme(
+  cardTheme: CardThemeData(
     elevation: 2.0,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(8.0),
