@@ -22,19 +22,24 @@ class HomeView extends StatelessWidget {
           ),
         ],
       ),
-      body: const SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(12.0),
-          child: Column (
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              HomeSection(title: 'New Musicals'),
-              HomeSection(title: 'Upcoming Shows'),
-              HomeSection(title: 'Popular Near You'),
-            ],
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1200),
+          child: const SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.all(12.0),
+              child: Column (
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  HomeSection(title: 'New Musicals'),
+                  HomeSection(title: 'Upcoming Shows'),
+                  HomeSection(title: 'Popular Near You'),
+                ],
+              ),
+            ),
           ),
-        )
-      )
+        ),
+      ),
     );
   }
 }

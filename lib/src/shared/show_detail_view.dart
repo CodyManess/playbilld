@@ -14,27 +14,26 @@ class ShowDetailView extends StatelessWidget {
       appBar: AppBar(
         title: Text(show.title),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Card(
-              margin: const EdgeInsets.all(16.0),
-              elevation: 4.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8.0),
-                child: Image.network(
-                  show.posterImageUrl,
-                  height: MediaQuery.of(context).size.height / 3,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.error, size: 50),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1200),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Card(
+                  margin: const EdgeInsets.all(16.0),
+                  elevation: 4.0,
+                  clipBehavior: Clip.antiAlias,
+                  child: Image.network(
+                    show.posterImageUrl,
+                    height: 400,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.error, size: 50),
+                  ),
                 ),
-              ),
-            ),
-            Padding(
+                Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,6 +65,8 @@ class ShowDetailView extends StatelessWidget {
             ),
           ],
         ),
+      ),
+      ),
       ),
     );
   }

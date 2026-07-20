@@ -9,14 +9,13 @@ class ShowPosterCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // Handle card click here, e.g., navigate to show details
-        context.push('/show_details', extra: show);
-      },
-      child: Card(
-        clipBehavior: Clip.antiAlias, // Prevents image from overflowing card edges
-        elevation: 2.0,
+    return Card(
+      clipBehavior: Clip.antiAlias, // Prevents image from overflowing card edges
+      elevation: 2.0,
+      child: InkWell(
+        onTap: () {
+          context.push('/show_details', extra: show);
+        },
         child: SizedBox(
           width: 160, // Adjusted width
           height: 240, // Adjusted height
@@ -24,8 +23,8 @@ class ShowPosterCard extends StatelessWidget {
             show.posterImageUrl,
             fit: BoxFit.cover, // Ensures the image covers the entire card
             errorBuilder: (context, object, stackTrace) => const Icon(Icons.error), //handles image load errors
-          )
-        )
+          ),
+        ),
       ),
     );
   }
