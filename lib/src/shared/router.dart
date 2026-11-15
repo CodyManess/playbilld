@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:playbilld/src/browse_feature/browse_view.dart';
@@ -74,11 +75,18 @@ GoRouter goRouter(Ref ref) {
             return ShowDetailView(show: extra);
           }
           final id = state.pathParameters['id'];
-          final show = id == null ? null : ref.read(showByIdProvider(id));
-          if (show == null) {
+          if (id == null) {
             return const _MissingShowView();
           }
-          return ShowDetailView(show: show);
+          return Consumer(
+            builder: (context, ref, _) {
+              final show = ref.watch(showByIdProvider(id));
+              if (show == null) {
+                return const _MissingShowView();
+              }
+              return ShowDetailView(show: show);
+            },
+          );
         },
       ),
     ],
