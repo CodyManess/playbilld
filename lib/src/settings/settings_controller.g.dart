@@ -12,18 +12,20 @@ part of 'settings_controller.dart';
 @ProviderFor(settingsService)
 final settingsServiceProvider = SettingsServiceProvider._();
 
-final class SettingsServiceProvider extends $FunctionalProvider<SettingsService,
-    SettingsService, SettingsService> with $Provider<SettingsService> {
+final class SettingsServiceProvider
+    extends
+        $FunctionalProvider<SettingsService, SettingsService, SettingsService>
+    with $Provider<SettingsService> {
   SettingsServiceProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'settingsServiceProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'settingsServiceProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$settingsServiceHash();
@@ -47,7 +49,7 @@ final class SettingsServiceProvider extends $FunctionalProvider<SettingsService,
   }
 }
 
-String _$settingsServiceHash() => r'626173756d1be84bec56f4e54c791f6675823426';
+String _$settingsServiceHash() => r'dc003134f7dee1aac6ecb382f6474dba7bcbbf41';
 
 @ProviderFor(ThemeModeNotifier)
 final themeModeProvider = ThemeModeNotifierProvider._();
@@ -55,15 +57,15 @@ final themeModeProvider = ThemeModeNotifierProvider._();
 final class ThemeModeNotifierProvider
     extends $NotifierProvider<ThemeModeNotifier, ThemeMode> {
   ThemeModeNotifierProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'themeModeProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'themeModeProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$themeModeNotifierHash();
@@ -81,7 +83,7 @@ final class ThemeModeNotifierProvider
   }
 }
 
-String _$themeModeNotifierHash() => r'726146cb6f95ad23822f4a8534fbc75a203d7be8';
+String _$themeModeNotifierHash() => r'0c3d08054b426ca476dc3e595184d984e55c20fb';
 
 abstract class _$ThemeModeNotifier extends $Notifier<ThemeMode> {
   ThemeMode build();
@@ -89,8 +91,14 @@ abstract class _$ThemeModeNotifier extends $Notifier<ThemeMode> {
   @override
   WhenComplete runBuild() {
     final ref = this.ref as $Ref<ThemeMode, ThemeMode>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<ThemeMode, ThemeMode>, ThemeMode, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<ThemeMode, ThemeMode>,
+              ThemeMode,
+              Object?,
+              Object?
+            >;
     return element.handleCreate(ref, build);
   }
 }

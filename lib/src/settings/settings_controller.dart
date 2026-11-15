@@ -1,16 +1,16 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'settings_service.dart';
 
 part 'settings_controller.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 SettingsService settingsService(Ref ref) {
   return SettingsService();
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class ThemeModeNotifier extends _$ThemeModeNotifier {
   @override
   ThemeMode build() {

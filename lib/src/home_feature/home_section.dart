@@ -1,12 +1,15 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:playbilld/src/mock/mock_shows.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:playbilld/src/models/show.dart';
 import 'package:playbilld/src/shared/playbill_card.dart';
 
 class HomeSection extends StatefulWidget {
   final String title;
+  final List<Show> shows;
 
-  const HomeSection({super.key, required this.title});
+  const HomeSection({super.key, required this.title, required this.shows});
 
   @override
   State<HomeSection> createState() => _HomeSectionState();
@@ -15,19 +18,19 @@ class HomeSection extends StatefulWidget {
 class _HomeSectionState extends State<HomeSection> {
   final ScrollController _scrollController = ScrollController();
 
-  void _scrollLeft() {
-    _scrollController.animateTo(
-      _scrollController.offset - 340, // approx two cards wide
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
+  void _scrollBy(double delta) {
+    if (!_scrollController.hasClients) return;
+    final position = _scrollController.position;
+    final target = (_scrollController.offset + delta).clamp(
+      0.0,
+      position.maxScrollExtent,
     );
-  }
-
-  void _scrollRight() {
-    _scrollController.animateTo(
-      _scrollController.offset + 340,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
+    unawaited(
+      _scrollController.animateTo(
+        target,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      ),
     );
   }
 
@@ -39,50 +42,56 @@ class _HomeSectionState extends State<HomeSection> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.shows.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     final bool showArrows = kIsWeb && MediaQuery.sizeOf(context).width > 600;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          widget.title,
-          style: Theme.of(context).textTheme.headlineSmall,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+          child: Text(
+            widget.title,
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+          ),
         ),
         const SizedBox(height: 8.0),
         SizedBox(
-          height: 260,
+          height: 308,
           width: double.infinity,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (showArrows)
                 IconButton(
                   icon: const Icon(Icons.arrow_back_ios),
-                  onPressed: _scrollLeft,
+                  onPressed: () => _scrollBy(-340),
                 ),
               Expanded(
-                child: Center(
-                  child: ListView.builder(
-                    controller: _scrollController,
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: mockShows.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final item = mockShows[index];
-                      return ShowPosterCard(show: item);
-                    },
-                  ),
+                child: ListView.separated(
+                  controller: _scrollController,
+                  scrollDirection: Axis.horizontal,
+                  itemCount: widget.shows.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(width: 8),
+                  itemBuilder: (BuildContext context, int index) {
+                    return ShowPosterCard(show: widget.shows[index]);
+                  },
                 ),
               ),
               if (showArrows)
                 IconButton(
                   icon: const Icon(Icons.arrow_forward_ios),
-                  onPressed: _scrollRight,
+                  onPressed: () => _scrollBy(340),
                 ),
             ],
           ),
         ),
-        const SizedBox(height: 16.0),
+        const SizedBox(height: 20.0),
       ],
     );
   }

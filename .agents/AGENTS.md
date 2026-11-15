@@ -8,7 +8,7 @@ Whenever an agent begins a task, it will automatically read these rules to under
 - **Description:** A Flutter application.
 - **Target Platforms:** Android, iOS, and Web. (We have specifically excluded Windows, macOS, and Linux desktop builds).
 - **Primary Devices/Browsers:** Prioritize mobile responsive layouts for modern iOS/Android devices, and ensure compatibility with modern desktop browsers (Chrome/Safari) for the web build.
-- **Tech Stack:** Flutter 3.44+, Dart 3.12+, Riverpod 3.x for state management, and GoRouter for navigation. 
+- **Tech Stack:** Flutter 3.47+ (targeting 3.50+ with `package:material_ui/material_ui.dart`), Dart 3.12+, Riverpod 3.x for state management, and GoRouter for navigation. 
 
 ## UI & Styling
 - [Example] Always use Material 3 design tokens.

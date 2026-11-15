@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'localization/app_localizations.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:playbilld/src/shared/theme.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:playbilld/src/shared/router.dart';
+import 'package:playbilld/src/shared/theme.dart';
+
+import 'localization/app_localizations.dart';
 import 'settings/settings_controller.dart';
 
 /// The Widget that configures your application.
@@ -13,6 +13,7 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
+    final router = ref.watch(goRouterProvider);
 
     return MaterialApp.router(
       // Providing a restorationScopeId allows the Navigator built by the
@@ -24,15 +25,8 @@ class MyApp extends ConsumerWidget {
       // Provide the generated AppLocalizations to the MaterialApp. This
       // allows descendant Widgets to display the correct translations
       // depending on the user's locale.
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('en', ''), // English, no country code
-      ],
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
 
       // Use AppLocalizations to configure the correct application title
       // depending on the user's locale.
@@ -46,17 +40,11 @@ class MyApp extends ConsumerWidget {
       // preferred ThemeMode (light, dark, or system default) from the
       // SettingsController to display the correct theme.
       theme: appTheme,
-      darkTheme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
-          brightness: Brightness.dark,
-        ),
-      ),
+      darkTheme: darkAppTheme,
       themeMode: themeMode,
 
       // Configure routing using go_router.
-      routerConfig: goRouter,
+      routerConfig: router,
     );
   }
 }
