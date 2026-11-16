@@ -7,8 +7,8 @@ import 'package:playbilld/src/mock/shows_provider.dart';
 import 'package:playbilld/src/reviews/log_review_sheet.dart';
 import 'package:playbilld/src/reviews/theater_log_controller.dart';
 import 'package:playbilld/src/shared/date_formatters.dart';
+import 'package:playbilld/src/shared/review_card.dart';
 import 'package:playbilld/src/shared/show_detail_view.dart';
-import 'package:playbilld/src/shared/star_rating_bar.dart';
 
 class DiaryView extends ConsumerWidget {
   static const routeName = '/diary';
@@ -68,75 +68,30 @@ class DiaryView extends ConsumerWidget {
                     final review = reviews[index];
                     final show = ref.watch(showByIdProvider(review.showId));
 
-                    return Card(
-                      child: InkWell(
-                        onTap: show == null
-                            ? null
-                            : () => unawaited(
-                                context.push(
-                                  ShowDetailView.routeFor(show.id),
-                                  extra: show,
-                                ),
+                    return ReviewCard(
+                      title: show?.title ?? review.showId,
+                      subtitle:
+                          '${review.runLabel} • ${mediumDateFormat.format(review.watchedDate)}',
+                      rating: review.rating,
+                      liked: review.liked,
+                      body: review.body,
+                      onTap: show == null
+                          ? null
+                          : () => unawaited(
+                              context.push(
+                                ShowDetailView.routeFor(show.id),
+                                extra: show,
                               ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(14),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      show?.title ?? review.showId,
-                                      style: theme.textTheme.titleMedium
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                    ),
-                                  ),
-                                  StarRatingBar(
-                                    rating: review.rating,
-                                    size: 16,
-                                  ),
-                                  if (review.liked) ...[
-                                    const SizedBox(width: 6),
-                                    Icon(
-                                      Icons.favorite,
-                                      size: 16,
-                                      color: theme.colorScheme.error,
-                                    ),
-                                  ],
-                                  if (show != null)
-                                    IconButton(
-                                      tooltip: 'Edit log',
-                                      icon: const Icon(
-                                        Icons.edit_outlined,
-                                        size: 18,
-                                      ),
-                                      onPressed: () => unawaited(
-                                        showLogReviewSheet(
-                                          context,
-                                          show,
-                                          existingReview: review,
-                                        ),
-                                      ),
-                                    ),
-                                ],
+                            ),
+                      onEdit: show == null
+                          ? null
+                          : () => unawaited(
+                              showLogReviewSheet(
+                                context,
+                                show,
+                                existingReview: review,
                               ),
-                              Text(
-                                '${review.runLabel} • ${mediumDateFormat.format(review.watchedDate)}',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                              if (review.body.isNotEmpty) ...[
-                                const SizedBox(height: 8),
-                                Text(review.body),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ),
+                            ),
                     );
                   },
                 ),

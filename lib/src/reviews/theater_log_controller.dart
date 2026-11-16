@@ -104,20 +104,22 @@ class TheaterLogNotifier extends _$TheaterLogNotifier {
     await ref.read(theaterLogServiceProvider).saveReviews(updated);
   }
 
-  Future<void> toggleWatchlist(String showId) async {
-    final updated = {...state.watchlistIds};
+  Set<String> _toggleId(Set<String> current, String showId) {
+    final updated = {...current};
     if (!updated.add(showId)) {
       updated.remove(showId);
     }
+    return updated;
+  }
+
+  Future<void> toggleWatchlist(String showId) async {
+    final updated = _toggleId(state.watchlistIds, showId);
     state = state.copyWith(watchlistIds: updated);
     await ref.read(theaterLogServiceProvider).saveWatchlist(updated);
   }
 
   Future<void> toggleLike(String showId) async {
-    final updated = {...state.likedShowIds};
-    if (!updated.add(showId)) {
-      updated.remove(showId);
-    }
+    final updated = _toggleId(state.likedShowIds, showId);
     state = state.copyWith(likedShowIds: updated);
     await ref.read(theaterLogServiceProvider).saveLikes(updated);
   }

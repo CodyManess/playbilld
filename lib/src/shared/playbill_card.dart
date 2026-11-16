@@ -8,6 +8,46 @@ import 'package:playbilld/src/models/show.dart';
 import 'package:playbilld/src/reviews/theater_log_controller.dart';
 import 'package:playbilld/src/shared/show_detail_view.dart';
 
+/// Shared responsive grid layout for [ShowPosterCard] collections.
+const SliverGridDelegateWithMaxCrossAxisExtent showPosterGridDelegate =
+    SliverGridDelegateWithMaxCrossAxisExtent(
+      maxCrossAxisExtent: 190,
+      mainAxisExtent: 300,
+      mainAxisSpacing: 12,
+      crossAxisSpacing: 12,
+    );
+
+/// Network poster image decoded at display pixel width with a theater fallback.
+class ShowPosterImage extends StatelessWidget {
+  final String imageUrl;
+  final double logicalWidth;
+
+  const ShowPosterImage({
+    super.key,
+    required this.imageUrl,
+    required this.logicalWidth,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final decodeWidth = (logicalWidth * MediaQuery.devicePixelRatioOf(context))
+        .round();
+
+    return Image.network(
+      imageUrl,
+      fit: BoxFit.cover,
+      cacheWidth: decodeWidth,
+      errorBuilder: (context, object, stackTrace) => Center(
+        child: Icon(
+          Icons.theaters,
+          size: 40,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
+      ),
+    );
+  }
+}
+
 class ShowPosterCard extends ConsumerWidget {
   final Show show;
   final double width;
@@ -34,24 +74,11 @@ class ShowPosterCard extends ConsumerWidget {
     final effectiveRating = ref.watch(effectiveShowRatingProvider(show));
     final now = ref.watch(currentDateProvider);
     final primaryRun = show.primaryRunAt(now);
-    final decodeWidth = (width * MediaQuery.devicePixelRatioOf(context))
-        .round();
 
     final posterStack = Stack(
       fit: StackFit.expand,
       children: [
-        Image.network(
-          show.posterImageUrl,
-          fit: BoxFit.cover,
-          cacheWidth: decodeWidth,
-          errorBuilder: (context, object, stackTrace) => Center(
-            child: Icon(
-              Icons.theaters,
-              size: 40,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ),
+        ShowPosterImage(imageUrl: show.posterImageUrl, logicalWidth: width),
         Positioned(
           top: 8,
           left: 8,

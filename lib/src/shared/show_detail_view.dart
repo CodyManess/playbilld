@@ -1,14 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:playbilld/src/mock/shows_provider.dart';
-import 'package:playbilld/src/models/review.dart';
 import 'package:playbilld/src/models/show.dart';
 import 'package:playbilld/src/reviews/log_review_sheet.dart';
 import 'package:playbilld/src/reviews/theater_log_controller.dart';
 import 'package:playbilld/src/shared/date_formatters.dart';
+import 'package:playbilld/src/shared/playbill_card.dart';
+import 'package:playbilld/src/shared/review_card.dart';
 import 'package:playbilld/src/shared/star_rating_bar.dart';
 
 class ShowDetailView extends ConsumerWidget {
@@ -125,11 +125,7 @@ class ShowDetailView extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 for (final run in show.runs)
-                  _RunCard(
-                    run: run,
-                    status: run.statusAt(now),
-                    dateFormat: mediumDateFormat,
-                  ),
+                  _RunCard(run: run, status: run.statusAt(now)),
                 const Divider(height: 32),
                 Text(
                   'Reviews (${reviews.length})',
@@ -150,9 +146,14 @@ class ShowDetailView extends ConsumerWidget {
                   )
                 else
                   for (final review in reviews)
-                    _ReviewCard(
-                      review: review,
-                      dateFormat: mediumDateFormat,
+                    ReviewCard(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      title: review.authorName,
+                      subtitle:
+                          '${review.runLabel} • Seen ${mediumDateFormat.format(review.watchedDate)}',
+                      rating: review.rating,
+                      liked: review.liked,
+                      body: review.body,
                       onEdit: review.isUserReview
                           ? () => unawaited(
                               showLogReviewSheet(
@@ -192,63 +193,57 @@ class _ShowHeader extends StatelessWidget {
       builder: (context, constraints) {
         final isCompact = constraints.maxWidth < 520;
         final posterWidth = isCompact ? 120.0 : 160.0;
-        final decodeWidth =
-            (posterWidth * MediaQuery.devicePixelRatioOf(context)).round();
-        final poster = Card(
-          clipBehavior: Clip.antiAlias,
-          child: SizedBox(
-            width: posterWidth,
-            height: isCompact ? 180 : 240,
-            child: Image.network(
-              show.posterImageUrl,
-              fit: BoxFit.cover,
-              cacheWidth: decodeWidth,
-              errorBuilder: (context, error, stackTrace) =>
-                  const Center(child: Icon(Icons.theaters, size: 40)),
-            ),
-          ),
-        );
-
-        final details = Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Wrap(
-              spacing: 8,
-              runSpacing: 6,
-              children: [
-                Chip(label: Text(show.form.label)),
-                Chip(label: Text(status.label)),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              show.genre,
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                StarRatingBar(rating: rating, size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  '$rating/5 ($reviewCount)',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        );
 
         return Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            poster,
+            Card(
+              clipBehavior: Clip.antiAlias,
+              child: SizedBox(
+                width: posterWidth,
+                height: isCompact ? 180 : 240,
+                child: ShowPosterImage(
+                  imageUrl: show.posterImageUrl,
+                  logicalWidth: posterWidth,
+                ),
+              ),
+            ),
             const SizedBox(width: 16),
-            Expanded(child: details),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 6,
+                    children: [
+                      Chip(label: Text(show.form.label)),
+                      Chip(label: Text(status.label)),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    show.genre,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      StarRatingBar(rating: rating, size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        '$rating/5 ($reviewCount)',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ],
         );
       },
@@ -259,20 +254,15 @@ class _ShowHeader extends StatelessWidget {
 class _RunCard extends StatelessWidget {
   final TheaterRun run;
   final RunStatus status;
-  final DateFormat dateFormat;
 
-  const _RunCard({
-    required this.run,
-    required this.status,
-    required this.dateFormat,
-  });
+  const _RunCard({required this.run, required this.status});
 
   @override
   Widget build(BuildContext context) {
     final end = run.endDate;
     final dateText = end == null
-        ? 'Opened ${dateFormat.format(run.startDate)} • Open-ended'
-        : '${dateFormat.format(run.startDate)} – ${dateFormat.format(end)}';
+        ? 'Opened ${mediumDateFormat.format(run.startDate)} • Open-ended'
+        : '${mediumDateFormat.format(run.startDate)} – ${mediumDateFormat.format(end)}';
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -282,73 +272,6 @@ class _RunCard extends StatelessWidget {
         subtitle: Text('${run.venue}, ${run.city}\n$dateText'),
         isThreeLine: true,
         trailing: Chip(label: Text(status.label)),
-      ),
-    );
-  }
-}
-
-class _ReviewCard extends StatelessWidget {
-  final ShowReview review;
-  final DateFormat dateFormat;
-  final VoidCallback? onEdit;
-
-  const _ReviewCard({
-    required this.review,
-    required this.dateFormat,
-    this.onEdit,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Card(
-      margin: const EdgeInsets.only(bottom: 10),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    review.authorName,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                StarRatingBar(rating: review.rating, size: 16),
-                if (review.liked) ...[
-                  const SizedBox(width: 6),
-                  Icon(
-                    Icons.favorite,
-                    size: 16,
-                    color: theme.colorScheme.error,
-                  ),
-                ],
-                if (onEdit != null) ...[
-                  const SizedBox(width: 4),
-                  IconButton(
-                    tooltip: 'Edit review',
-                    icon: const Icon(Icons.edit_outlined, size: 18),
-                    onPressed: onEdit,
-                  ),
-                ],
-              ],
-            ),
-            Text(
-              '${review.runLabel} • Seen ${dateFormat.format(review.watchedDate)}',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            if (review.body.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Text(review.body, style: theme.textTheme.bodyMedium),
-            ],
-          ],
-        ),
       ),
     );
   }

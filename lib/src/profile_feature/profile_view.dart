@@ -130,13 +130,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                 SliverPadding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                   sliver: SliverGrid.builder(
-                    gridDelegate:
-                        const SliverGridDelegateWithMaxCrossAxisExtent(
-                          maxCrossAxisExtent: 190,
-                          mainAxisExtent: 300,
-                          mainAxisSpacing: 12,
-                          crossAxisSpacing: 12,
-                        ),
+                    gridDelegate: showPosterGridDelegate,
                     itemCount: shows.length,
                     itemBuilder: (context, index) {
                       return ShowPosterCard(show: shows[index]);

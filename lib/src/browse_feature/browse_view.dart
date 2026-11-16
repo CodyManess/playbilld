@@ -73,59 +73,19 @@ class _BrowseViewState extends ConsumerState<BrowseView> {
                   onChanged: _onSearchChanged,
                 ),
               ),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 4,
-                ),
-                child: Row(
-                  children: [
-                    ChoiceChip(
-                      label: const Text('All Forms'),
-                      selected: filter.form == null,
-                      onSelected: (_) => filterNotifier.setForm(null),
-                    ),
-                    const SizedBox(width: 8),
-                    for (final form in TheaterForm.values) ...[
-                      ChoiceChip(
-                        label: Text(form.label),
-                        selected: filter.form == form,
-                        onSelected: (_) => filterNotifier.setForm(
-                          filter.form == form ? null : form,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                    ],
-                  ],
-                ),
+              _FilterChipRow<TheaterForm>(
+                allLabel: 'All Forms',
+                values: TheaterForm.values,
+                selected: filter.form,
+                labelOf: (form) => form.label,
+                onSelected: filterNotifier.setForm,
               ),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 4,
-                ),
-                child: Row(
-                  children: [
-                    ChoiceChip(
-                      label: const Text('All Runs'),
-                      selected: filter.status == null,
-                      onSelected: (_) => filterNotifier.setStatus(null),
-                    ),
-                    const SizedBox(width: 8),
-                    for (final status in RunStatus.values) ...[
-                      ChoiceChip(
-                        label: Text(status.label),
-                        selected: filter.status == status,
-                        onSelected: (_) => filterNotifier.setStatus(
-                          filter.status == status ? null : status,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                    ],
-                  ],
-                ),
+              _FilterChipRow<RunStatus>(
+                allLabel: 'All Runs',
+                values: RunStatus.values,
+                selected: filter.status,
+                labelOf: (status) => status.label,
+                onSelected: filterNotifier.setStatus,
               ),
               const SizedBox(height: 8),
               Expanded(
@@ -149,13 +109,7 @@ class _BrowseViewState extends ConsumerState<BrowseView> {
                       )
                     : GridView.builder(
                         padding: const EdgeInsets.all(16),
-                        gridDelegate:
-                            const SliverGridDelegateWithMaxCrossAxisExtent(
-                              maxCrossAxisExtent: 190,
-                              mainAxisExtent: 300,
-                              mainAxisSpacing: 12,
-                              crossAxisSpacing: 12,
-                            ),
+                        gridDelegate: showPosterGridDelegate,
                         itemCount: shows.length,
                         itemBuilder: (context, index) {
                           return ShowPosterCard(show: shows[index]);
@@ -165,6 +119,47 @@ class _BrowseViewState extends ConsumerState<BrowseView> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _FilterChipRow<T> extends StatelessWidget {
+  final String allLabel;
+  final List<T> values;
+  final T? selected;
+  final String Function(T) labelOf;
+  final void Function(T?) onSelected;
+
+  const _FilterChipRow({
+    required this.allLabel,
+    required this.values,
+    required this.selected,
+    required this.labelOf,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Row(
+        children: [
+          ChoiceChip(
+            label: Text(allLabel),
+            selected: selected == null,
+            onSelected: (_) => onSelected(null),
+          ),
+          for (final value in values) ...[
+            const SizedBox(width: 8),
+            ChoiceChip(
+              label: Text(labelOf(value)),
+              selected: selected == value,
+              onSelected: (_) => onSelected(selected == value ? null : value),
+            ),
+          ],
+        ],
       ),
     );
   }

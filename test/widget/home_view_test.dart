@@ -9,6 +9,22 @@ import 'package:playbilld/src/settings/settings_controller.dart';
 import 'package:playbilld/src/shared/router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+Future<void> _pumpApp(
+  WidgetTester tester,
+  Future<void> Function(ProviderContainer container) body,
+) async {
+  final container = ProviderContainer();
+  addTearDown(container.dispose);
+
+  await mockNetworkImagesFor(() async {
+    await tester.pumpWidget(
+      UncontrolledProviderScope(container: container, child: const MyApp()),
+    );
+    await tester.pumpAndSettle();
+    await body(container);
+  });
+}
+
 void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
@@ -17,15 +33,7 @@ void main() {
   testWidgets(
     'AppShell navigates across Discover, Browse, Diary, and Profile',
     (WidgetTester tester) async {
-      final container = ProviderContainer();
-      addTearDown(container.dispose);
-
-      await mockNetworkImagesFor(() async {
-        await tester.pumpWidget(
-          UncontrolledProviderScope(container: container, child: const MyApp()),
-        );
-        await tester.pumpAndSettle();
-
+      await _pumpApp(tester, (container) async {
         expect(find.text('Playbilld'), findsOneWidget);
         expect(find.text('Now Playing'), findsOneWidget);
         expect(find.text('Top Rated Theater'), findsOneWidget);
@@ -61,15 +69,7 @@ void main() {
   testWidgets('Logging a review from ShowDetailView appears in Diary', (
     WidgetTester tester,
   ) async {
-    final container = ProviderContainer();
-    addTearDown(container.dispose);
-
-    await mockNetworkImagesFor(() async {
-      await tester.pumpWidget(
-        UncontrolledProviderScope(container: container, child: const MyApp()),
-      );
-      await tester.pumpAndSettle();
-
+    await _pumpApp(tester, (container) async {
       unawaited(container.read(goRouterProvider).push('/shows/wicked'));
       await tester.pumpAndSettle();
 
@@ -107,15 +107,7 @@ void main() {
   testWidgets(
     'Deep link /shows/:id resolves show and unknown ID shows fallback',
     (WidgetTester tester) async {
-      final container = ProviderContainer();
-      addTearDown(container.dispose);
-
-      await mockNetworkImagesFor(() async {
-        await tester.pumpWidget(
-          UncontrolledProviderScope(container: container, child: const MyApp()),
-        );
-        await tester.pumpAndSettle();
-
+      await _pumpApp(tester, (container) async {
         container.read(goRouterProvider).go('/shows/wicked');
         await tester.pumpAndSettle();
         expect(find.widgetWithText(AppBar, 'Wicked'), findsOneWidget);
