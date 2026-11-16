@@ -8,24 +8,27 @@ part of 'shows_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Reference date used to determine whether a run is now playing, upcoming, or closed.
+/// Reference date normalized to midnight so run-status checks don't recompute
+/// on sub-day timestamps across widget builds.
 
 @ProviderFor(currentDate)
 final currentDateProvider = CurrentDateProvider._();
 
-/// Reference date used to determine whether a run is now playing, upcoming, or closed.
+/// Reference date normalized to midnight so run-status checks don't recompute
+/// on sub-day timestamps across widget builds.
 
 final class CurrentDateProvider
     extends $FunctionalProvider<DateTime, DateTime, DateTime>
     with $Provider<DateTime> {
-  /// Reference date used to determine whether a run is now playing, upcoming, or closed.
+  /// Reference date normalized to midnight so run-status checks don't recompute
+  /// on sub-day timestamps across widget builds.
   CurrentDateProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
         name: r'currentDateProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -52,7 +55,7 @@ final class CurrentDateProvider
   }
 }
 
-String _$currentDateHash() => r'47eb6f7c6298cdca8b6f56e5781d8cbd6672a4cd';
+String _$currentDateHash() => r'd2e01268150077bf23fc2d7700fabfe4d7256252';
 
 /// Provides the full catalog of shows.
 
@@ -71,7 +74,7 @@ final class ShowsProvider
         argument: null,
         retry: null,
         name: r'showsProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -98,7 +101,59 @@ final class ShowsProvider
   }
 }
 
-String _$showsHash() => r'1e090f829f2dc950a4e53812aa953cd514917efd';
+String _$showsHash() => r'51594d5f17ca38c671342b0f61b4822c5272df21';
+
+/// Precomputed lowercase search index keyed by [Show.id].
+
+@ProviderFor(showSearchIndex)
+final showSearchIndexProvider = ShowSearchIndexProvider._();
+
+/// Precomputed lowercase search index keyed by [Show.id].
+
+final class ShowSearchIndexProvider
+    extends
+        $FunctionalProvider<
+          Map<String, String>,
+          Map<String, String>,
+          Map<String, String>
+        >
+    with $Provider<Map<String, String>> {
+  /// Precomputed lowercase search index keyed by [Show.id].
+  ShowSearchIndexProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'showSearchIndexProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$showSearchIndexHash();
+
+  @$internal
+  @override
+  $ProviderElement<Map<String, String>> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  Map<String, String> create(Ref ref) {
+    return showSearchIndex(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Map<String, String> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<Map<String, String>>(value),
+    );
+  }
+}
+
+String _$showSearchIndexHash() => r'5923fc73e679bfb980ee0bb50fdc8b7476b12355';
 
 /// Looks up a single [Show] by its route [id], returning `null` if not found.
 
@@ -420,4 +475,4 @@ final class FilteredShowsProvider
   }
 }
 
-String _$filteredShowsHash() => r'244f899632f6a08556919b481dadf61b75670628';
+String _$filteredShowsHash() => r'3aa7380f275f91335f017c1c0f09267fc938a5c5';

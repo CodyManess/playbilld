@@ -23,12 +23,19 @@ class ShowPosterCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final logState = ref.watch(theaterLogProvider);
+    final isWatchlisted = ref.watch(
+      theaterLogProvider.select((s) => s.watchlistIds.contains(show.id)),
+    );
+    final isLogged = ref.watch(
+      theaterLogProvider.select(
+        (s) => s.userReviews.any((r) => r.showId == show.id),
+      ),
+    );
     final effectiveRating = ref.watch(effectiveShowRatingProvider(show));
     final now = ref.watch(currentDateProvider);
     final primaryRun = show.primaryRunAt(now);
-    final isWatchlisted = logState.watchlistIds.contains(show.id);
-    final isLogged = logState.userReviews.any((r) => r.showId == show.id);
+    final decodeWidth = (width * MediaQuery.devicePixelRatioOf(context))
+        .round();
 
     final posterStack = Stack(
       fit: StackFit.expand,
@@ -36,6 +43,7 @@ class ShowPosterCard extends ConsumerWidget {
         Image.network(
           show.posterImageUrl,
           fit: BoxFit.cover,
+          cacheWidth: decodeWidth,
           errorBuilder: (context, object, stackTrace) => Center(
             child: Icon(
               Icons.theaters,

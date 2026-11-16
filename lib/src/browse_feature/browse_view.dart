@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:playbilld/src/mock/shows_provider.dart';
@@ -15,9 +17,26 @@ class BrowseView extends ConsumerStatefulWidget {
 
 class _BrowseViewState extends ConsumerState<BrowseView> {
   final TextEditingController _searchController = TextEditingController();
+  Timer? _searchDebounce;
+
+  void _onSearchChanged(String value) {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 150), () {
+      if (mounted) {
+        ref.read(browseFilterProvider.notifier).setQuery(value);
+      }
+    });
+  }
+
+  void _clearSearch() {
+    _searchDebounce?.cancel();
+    _searchController.clear();
+    ref.read(browseFilterProvider.notifier).setQuery('');
+  }
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
     _searchController.dispose();
     super.dispose();
   }
@@ -46,15 +65,12 @@ class _BrowseViewState extends ConsumerState<BrowseView> {
                         ? IconButton(
                             tooltip: 'Clear search',
                             icon: const Icon(Icons.clear),
-                            onPressed: () {
-                              _searchController.clear();
-                              filterNotifier.setQuery('');
-                            },
+                            onPressed: _clearSearch,
                           )
                         : null,
                     border: const OutlineInputBorder(),
                   ),
-                  onChanged: filterNotifier.setQuery,
+                  onChanged: _onSearchChanged,
                 ),
               ),
               SingleChildScrollView(
@@ -122,6 +138,7 @@ class _BrowseViewState extends ConsumerState<BrowseView> {
                             const SizedBox(height: 12),
                             OutlinedButton(
                               onPressed: () {
+                                _searchDebounce?.cancel();
                                 _searchController.clear();
                                 filterNotifier.clearAll();
                               },

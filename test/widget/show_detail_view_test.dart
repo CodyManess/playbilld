@@ -73,9 +73,11 @@ void main() {
 
       expect(find.byType(Image), findsOneWidget);
       final Image image = tester.widget(find.byType(Image));
-      expect(image.image, isA<NetworkImage>());
+      expect(image.image, isA<ResizeImage>());
+      final resized = image.image as ResizeImage;
+      expect(resized.imageProvider, isA<NetworkImage>());
       expect(
-        (image.image as NetworkImage).url,
+        (resized.imageProvider as NetworkImage).url,
         'http://example.com/poster.jpg',
       );
     });

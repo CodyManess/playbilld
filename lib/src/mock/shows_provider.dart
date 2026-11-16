@@ -4,16 +4,35 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'shows_provider.g.dart';
 
-/// Reference date used to determine whether a run is now playing, upcoming, or closed.
-@riverpod
+/// Reference date normalized to midnight so run-status checks don't recompute
+/// on sub-day timestamps across widget builds.
+@Riverpod(keepAlive: true)
 DateTime currentDate(Ref ref) {
-  return DateTime.now();
+  final now = DateTime.now();
+  return DateTime(now.year, now.month, now.day);
 }
 
 /// Provides the full catalog of shows.
-@riverpod
+@Riverpod(keepAlive: true)
 List<Show> shows(Ref ref) {
   return mockShows;
+}
+
+/// Precomputed lowercase search index keyed by [Show.id].
+@Riverpod(keepAlive: true)
+Map<String, String> showSearchIndex(Ref ref) {
+  final allShows = ref.watch(showsProvider);
+  return {
+    for (final show in allShows)
+      show.id: [
+        show.title,
+        show.genre,
+        show.form.label,
+        ...show.creators,
+        ...show.cast,
+        ...show.runs.expand((r) => [r.productionName, r.venue, r.city]),
+      ].join(' ').toLowerCase(),
+  };
 }
 
 /// Looks up a single [Show] by its route [id], returning `null` if not found.
@@ -105,6 +124,7 @@ class BrowseFilterNotifier extends _$BrowseFilterNotifier {
 List<Show> filteredShows(Ref ref) {
   final filter = ref.watch(browseFilterProvider);
   final now = ref.watch(currentDateProvider);
+  final searchIndex = ref.watch(showSearchIndexProvider);
   final query = filter.query.trim().toLowerCase();
 
   return ref.watch(showsProvider).where((show) {
@@ -117,14 +137,6 @@ List<Show> filteredShows(Ref ref) {
     if (query.isEmpty) {
       return true;
     }
-    final haystack = [
-      show.title,
-      show.genre,
-      show.form.label,
-      ...show.creators,
-      ...show.cast,
-      ...show.runs.expand((r) => [r.productionName, r.venue, r.city]),
-    ].join(' ').toLowerCase();
-    return haystack.contains(query);
+    return (searchIndex[show.id] ?? '').contains(query);
   }).toList();
 }

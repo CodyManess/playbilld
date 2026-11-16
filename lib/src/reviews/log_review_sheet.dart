@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:playbilld/src/models/review.dart';
 import 'package:playbilld/src/models/show.dart';
 import 'package:playbilld/src/reviews/theater_log_controller.dart';
+import 'package:playbilld/src/shared/date_formatters.dart';
 import 'package:playbilld/src/shared/star_rating_bar.dart';
 
 Future<void> showLogReviewSheet(
@@ -111,7 +111,6 @@ class _LogReviewSheetState extends ConsumerState<_LogReviewSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
-    final dateFormat = DateFormat.yMMMd();
 
     return Padding(
       padding: EdgeInsets.fromLTRB(20, 16, 20, 20 + bottomInset),
@@ -173,7 +172,9 @@ class _LogReviewSheetState extends ConsumerState<_LogReviewSheet> {
                   child: OutlinedButton.icon(
                     onPressed: () => unawaited(_pickDate()),
                     icon: const Icon(Icons.calendar_today, size: 18),
-                    label: Text('Seen ${dateFormat.format(_watchedDate)}'),
+                    label: Text(
+                      'Seen ${mediumDateFormat.format(_watchedDate)}',
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),

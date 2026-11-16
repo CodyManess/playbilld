@@ -81,15 +81,19 @@ class TheaterLogNotifier extends _$TheaterLogNotifier {
     updated.sort((a, b) => b.watchedDate.compareTo(a.watchedDate));
 
     final updatedLikes = {...state.likedShowIds};
-    if (review.liked) {
-      updatedLikes.add(review.showId);
-    }
+    final likesChanged = review.liked && updatedLikes.add(review.showId);
 
     state = state.copyWith(userReviews: updated, likedShowIds: updatedLikes);
 
     final service = ref.read(theaterLogServiceProvider);
-    await service.saveReviews(updated);
-    await service.saveLikes(updatedLikes);
+    if (likesChanged) {
+      await Future.wait([
+        service.saveReviews(updated),
+        service.saveLikes(updatedLikes),
+      ]);
+    } else {
+      await service.saveReviews(updated);
+    }
   }
 
   Future<void> deleteReview(String reviewId) async {

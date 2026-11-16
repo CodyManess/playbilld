@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:playbilld/src/mock/shows_provider.dart';
 import 'package:playbilld/src/reviews/log_review_sheet.dart';
 import 'package:playbilld/src/reviews/theater_log_controller.dart';
+import 'package:playbilld/src/shared/date_formatters.dart';
 import 'package:playbilld/src/shared/show_detail_view.dart';
 import 'package:playbilld/src/shared/star_rating_bar.dart';
 
@@ -19,7 +19,6 @@ class DiaryView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final reviews = ref.watch(theaterLogProvider).userReviews;
     final theme = Theme.of(context);
-    final dateFormat = DateFormat.yMMMd();
 
     return Scaffold(
       appBar: AppBar(title: const Text('Theater Diary')),
@@ -125,7 +124,7 @@ class DiaryView extends ConsumerWidget {
                                 ],
                               ),
                               Text(
-                                '${review.runLabel} • ${dateFormat.format(review.watchedDate)}',
+                                '${review.runLabel} • ${mediumDateFormat.format(review.watchedDate)}',
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: theme.colorScheme.onSurfaceVariant,
                                 ),

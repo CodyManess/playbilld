@@ -1,0 +1,8 @@
+targets:
+  $default:
+    builders:
+      riverpod_generator:
+        generate_for:
+          - lib/src/**/*_provider.dart
+          - lib/src/**/*_controller.dart
+          - lib/src/shared/router.dart

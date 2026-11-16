@@ -8,6 +8,7 @@ import 'package:playbilld/src/models/review.dart';
 import 'package:playbilld/src/models/show.dart';
 import 'package:playbilld/src/reviews/log_review_sheet.dart';
 import 'package:playbilld/src/reviews/theater_log_controller.dart';
+import 'package:playbilld/src/shared/date_formatters.dart';
 import 'package:playbilld/src/shared/star_rating_bar.dart';
 
 class ShowDetailView extends ConsumerWidget {
@@ -22,17 +23,20 @@ class ShowDetailView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final dateFormat = DateFormat.yMMMd();
     final now = ref.watch(currentDateProvider);
-    final logState = ref.watch(theaterLogProvider);
+    final isWatchlisted = ref.watch(
+      theaterLogProvider.select((s) => s.watchlistIds.contains(show.id)),
+    );
+    final isLiked = ref.watch(
+      theaterLogProvider.select((s) => s.likedShowIds.contains(show.id)),
+    );
+    final userReview = ref.watch(
+      theaterLogProvider.select(
+        (s) => s.userReviews.where((r) => r.showId == show.id).firstOrNull,
+      ),
+    );
     final reviews = ref.watch(reviewsForShowProvider(show.id));
     final ratingSummary = ref.watch(effectiveShowRatingProvider(show));
-
-    final isWatchlisted = logState.watchlistIds.contains(show.id);
-    final isLiked = logState.likedShowIds.contains(show.id);
-    final userReview = logState.userReviews
-        .where((review) => review.showId == show.id)
-        .firstOrNull;
     final overallStatus = show.statusAt(now);
 
     return Scaffold(
@@ -124,7 +128,7 @@ class ShowDetailView extends ConsumerWidget {
                   _RunCard(
                     run: run,
                     status: run.statusAt(now),
-                    dateFormat: dateFormat,
+                    dateFormat: mediumDateFormat,
                   ),
                 const Divider(height: 32),
                 Text(
@@ -148,7 +152,7 @@ class ShowDetailView extends ConsumerWidget {
                   for (final review in reviews)
                     _ReviewCard(
                       review: review,
-                      dateFormat: dateFormat,
+                      dateFormat: mediumDateFormat,
                       onEdit: review.isUserReview
                           ? () => unawaited(
                               showLogReviewSheet(
@@ -187,14 +191,18 @@ class _ShowHeader extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isCompact = constraints.maxWidth < 520;
+        final posterWidth = isCompact ? 120.0 : 160.0;
+        final decodeWidth =
+            (posterWidth * MediaQuery.devicePixelRatioOf(context)).round();
         final poster = Card(
           clipBehavior: Clip.antiAlias,
           child: SizedBox(
-            width: isCompact ? 120 : 160,
+            width: posterWidth,
             height: isCompact ? 180 : 240,
             child: Image.network(
               show.posterImageUrl,
               fit: BoxFit.cover,
+              cacheWidth: decodeWidth,
               errorBuilder: (context, error, stackTrace) =>
                   const Center(child: Icon(Icons.theaters, size: 40)),
             ),

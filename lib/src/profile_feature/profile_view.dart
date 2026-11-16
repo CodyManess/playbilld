@@ -26,12 +26,14 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
   @override
   Widget build(BuildContext context) {
     final stats = ref.watch(userTheaterStatsProvider);
-    final logState = ref.watch(theaterLogProvider);
+    final targetIds = ref.watch(
+      theaterLogProvider.select(
+        (state) => _selectedCollection == _ProfileCollection.watchlist
+            ? state.watchlistIds
+            : state.likedShowIds,
+      ),
+    );
     final allShows = ref.watch(showsProvider);
-
-    final targetIds = _selectedCollection == _ProfileCollection.watchlist
-        ? logState.watchlistIds
-        : logState.likedShowIds;
     final List<Show> shows = allShows
         .where((show) => targetIds.contains(show.id))
         .toList();
@@ -52,55 +54,67 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1000),
-          child: ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: [
-                  _StatCard(label: 'Logged', value: '${stats.loggedCount}'),
-                  _StatCard(
-                    label: 'Reviews',
-                    value: '${stats.writtenReviewCount}',
+          child: CustomScrollView(
+            slivers: [
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                sliver: SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: [
+                          _StatCard(
+                            label: 'Logged',
+                            value: '${stats.loggedCount}',
+                          ),
+                          _StatCard(
+                            label: 'Reviews',
+                            value: '${stats.writtenReviewCount}',
+                          ),
+                          _StatCard(
+                            label: 'Watchlist',
+                            value: '${stats.watchlistCount}',
+                          ),
+                          _StatCard(
+                            label: 'Avg Rating',
+                            value: stats.averageRating == null
+                                ? '—'
+                                : '${stats.averageRating}/5',
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      SegmentedButton<_ProfileCollection>(
+                        segments: const [
+                          ButtonSegment<_ProfileCollection>(
+                            value: _ProfileCollection.watchlist,
+                            label: Text('Watchlist'),
+                            icon: Icon(Icons.bookmark_outline),
+                          ),
+                          ButtonSegment<_ProfileCollection>(
+                            value: _ProfileCollection.likes,
+                            label: Text('Liked'),
+                            icon: Icon(Icons.favorite_border),
+                          ),
+                        ],
+                        selected: {_selectedCollection},
+                        onSelectionChanged: (selection) {
+                          setState(() {
+                            _selectedCollection = selection.first;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                    ],
                   ),
-                  _StatCard(
-                    label: 'Watchlist',
-                    value: '${stats.watchlistCount}',
-                  ),
-                  _StatCard(
-                    label: 'Avg Rating',
-                    value: stats.averageRating == null
-                        ? '—'
-                        : '${stats.averageRating}/5',
-                  ),
-                ],
+                ),
               ),
-              const SizedBox(height: 20),
-              SegmentedButton<_ProfileCollection>(
-                segments: const [
-                  ButtonSegment<_ProfileCollection>(
-                    value: _ProfileCollection.watchlist,
-                    label: Text('Watchlist'),
-                    icon: Icon(Icons.bookmark_outline),
-                  ),
-                  ButtonSegment<_ProfileCollection>(
-                    value: _ProfileCollection.likes,
-                    label: Text('Liked'),
-                    icon: Icon(Icons.favorite_border),
-                  ),
-                ],
-                selected: {_selectedCollection},
-                onSelectionChanged: (selection) {
-                  setState(() {
-                    _selectedCollection = selection.first;
-                  });
-                },
-              ),
-              const SizedBox(height: 16),
               if (shows.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 32),
+                SliverFillRemaining(
+                  hasScrollBody: false,
                   child: Center(
                     child: Text(
                       _selectedCollection == _ProfileCollection.watchlist
@@ -113,19 +127,21 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                   ),
                 )
               else
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 190,
-                    mainAxisExtent: 300,
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  sliver: SliverGrid.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 190,
+                          mainAxisExtent: 300,
+                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 12,
+                        ),
+                    itemCount: shows.length,
+                    itemBuilder: (context, index) {
+                      return ShowPosterCard(show: shows[index]);
+                    },
                   ),
-                  itemCount: shows.length,
-                  itemBuilder: (context, index) {
-                    return ShowPosterCard(show: shows[index]);
-                  },
                 ),
             ],
           ),
