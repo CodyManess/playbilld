@@ -1,3 +1,6 @@
+import 'package:flutter/foundation.dart';
+
+@immutable
 class ShowReview {
   final String id;
   final String showId;
@@ -84,4 +87,36 @@ class ShowReview {
       isUserReview: json['isUserReview'] as bool? ?? true,
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ShowReview &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          showId == other.showId &&
+          runId == other.runId &&
+          runLabel == other.runLabel &&
+          authorName == other.authorName &&
+          rating == other.rating &&
+          liked == other.liked &&
+          body == other.body &&
+          watchedDate == other.watchedDate &&
+          createdAt == other.createdAt &&
+          isUserReview == other.isUserReview;
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    showId,
+    runId,
+    runLabel,
+    authorName,
+    rating,
+    liked,
+    body,
+    watchedDate,
+    createdAt,
+    isUserReview,
+  );
 }

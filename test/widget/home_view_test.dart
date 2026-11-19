@@ -105,12 +105,17 @@ void main() {
   });
 
   testWidgets(
-    'Deep link /shows/:id resolves show and unknown ID shows fallback',
+    'Deep link /shows/:id resolves show, navigates home, and unknown ID shows fallback',
     (WidgetTester tester) async {
       await _pumpApp(tester, (container) async {
         container.read(goRouterProvider).go('/shows/wicked');
         await tester.pumpAndSettle();
         expect(find.widgetWithText(AppBar, 'Wicked'), findsOneWidget);
+        expect(find.byTooltip('Back to Discover'), findsOneWidget);
+
+        await tester.tap(find.byTooltip('Back to Discover'));
+        await tester.pumpAndSettle();
+        expect(find.text('Playbilld'), findsOneWidget);
 
         container.read(goRouterProvider).go('/shows/does-not-exist');
         await tester.pumpAndSettle();

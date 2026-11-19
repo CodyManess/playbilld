@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:playbilld/src/mock/mock_reviews.dart';
 import 'package:playbilld/src/models/review.dart';
 import 'package:playbilld/src/models/show.dart';
@@ -7,6 +8,7 @@ import 'theater_log_service.dart';
 
 part 'theater_log_controller.g.dart';
 
+@immutable
 class TheaterLogState {
   final List<ShowReview> userReviews;
   final Set<String> watchlistIds;
@@ -29,8 +31,25 @@ class TheaterLogState {
       likedShowIds: likedShowIds ?? this.likedShowIds,
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TheaterLogState &&
+          runtimeType == other.runtimeType &&
+          listEquals(userReviews, other.userReviews) &&
+          setEquals(watchlistIds, other.watchlistIds) &&
+          setEquals(likedShowIds, other.likedShowIds);
+
+  @override
+  int get hashCode => Object.hash(
+    Object.hashAll(userReviews),
+    Object.hashAllUnordered(watchlistIds),
+    Object.hashAllUnordered(likedShowIds),
+  );
 }
 
+@immutable
 class UserTheaterStats {
   final int loggedCount;
   final int writtenReviewCount;
@@ -45,6 +64,26 @@ class UserTheaterStats {
     required this.likedCount,
     required this.averageRating,
   });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UserTheaterStats &&
+          runtimeType == other.runtimeType &&
+          loggedCount == other.loggedCount &&
+          writtenReviewCount == other.writtenReviewCount &&
+          watchlistCount == other.watchlistCount &&
+          likedCount == other.likedCount &&
+          averageRating == other.averageRating;
+
+  @override
+  int get hashCode => Object.hash(
+    loggedCount,
+    writtenReviewCount,
+    watchlistCount,
+    likedCount,
+    averageRating,
+  );
 }
 
 @Riverpod(keepAlive: true)

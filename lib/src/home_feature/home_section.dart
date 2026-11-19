@@ -47,27 +47,33 @@ class _HomeSectionState extends State<HomeSection> {
     }
 
     final bool showArrows = kIsWeb && MediaQuery.sizeOf(context).width > 600;
+    final scale = MediaQuery.textScalerOf(context).scale(1.0).clamp(1.0, 2.0);
+    final sectionHeight = 308 + (scale - 1.0) * 60;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4.0),
-          child: Text(
-            widget.title,
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+          child: Semantics(
+            header: true,
+            child: Text(
+              widget.title,
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            ),
           ),
         ),
         const SizedBox(height: 8.0),
         SizedBox(
-          height: 308,
+          height: sectionHeight,
           width: double.infinity,
           child: Row(
             children: [
               if (showArrows)
                 IconButton(
+                  tooltip: 'Scroll ${widget.title} left',
                   icon: const Icon(Icons.arrow_back_ios),
                   onPressed: () => _scrollBy(-340),
                 ),
@@ -85,6 +91,7 @@ class _HomeSectionState extends State<HomeSection> {
               ),
               if (showArrows)
                 IconButton(
+                  tooltip: 'Scroll ${widget.title} right',
                   icon: const Icon(Icons.arrow_forward_ios),
                   onPressed: () => _scrollBy(340),
                 ),

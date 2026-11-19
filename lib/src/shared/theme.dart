@@ -1,9 +1,13 @@
 import 'package:material_ui/material_ui.dart';
 
-ThemeData _buildTheme(Brightness brightness) {
+ThemeData _buildTheme(
+  Brightness brightness, {
+  double contrastLevel = ContrastLevel.standard,
+}) {
   final ColorScheme colorScheme = ColorScheme.fromSeed(
     seedColor: Colors.deepPurple,
     brightness: brightness,
+    contrastLevel: contrastLevel,
   );
 
   return ThemeData(
@@ -24,3 +28,11 @@ ThemeData _buildTheme(Brightness brightness) {
 
 final ThemeData appTheme = _buildTheme(Brightness.light);
 final ThemeData darkAppTheme = _buildTheme(Brightness.dark);
+final ThemeData highContrastAppTheme = _buildTheme(
+  Brightness.light,
+  contrastLevel: ContrastLevel.high,
+);
+final ThemeData highContrastDarkAppTheme = _buildTheme(
+  Brightness.dark,
+  contrastLevel: ContrastLevel.high,
+);

@@ -6,3 +6,8 @@ targets:
           - lib/src/**/*_provider.dart
           - lib/src/**/*_controller.dart
           - lib/src/shared/router.dart
+      source_gen:combining_builder:
+        generate_for:
+          - lib/src/**/*_provider.dart
+          - lib/src/**/*_controller.dart
+          - lib/src/shared/router.dart

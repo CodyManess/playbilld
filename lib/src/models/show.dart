@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 enum TheaterForm {
   musical('Musical'),
   play('Play'),
@@ -20,6 +22,7 @@ enum RunStatus {
   final String label;
 }
 
+@immutable
 class TheaterRun {
   final String id;
   final String productionName;
@@ -47,8 +50,25 @@ class TheaterRun {
     }
     return RunStatus.nowPlaying;
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TheaterRun &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          productionName == other.productionName &&
+          venue == other.venue &&
+          city == other.city &&
+          startDate == other.startDate &&
+          endDate == other.endDate;
+
+  @override
+  int get hashCode =>
+      Object.hash(id, productionName, venue, city, startDate, endDate);
 }
 
+@immutable
 class Show {
   final String id;
   final String title;
@@ -74,7 +94,7 @@ class Show {
     required this.averageRating,
     this.reviewCount = 0,
     required this.posterImageUrl,
-  });
+  }) : assert(runs.length > 0, 'A show must have at least one TheaterRun.');
 
   TheaterRun primaryRunAt(DateTime referenceDate) {
     for (final run in runs) {
@@ -103,4 +123,36 @@ class Show {
     }
     return hasUpcoming ? RunStatus.upcoming : RunStatus.closed;
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Show &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          title == other.title &&
+          description == other.description &&
+          form == other.form &&
+          genre == other.genre &&
+          listEquals(creators, other.creators) &&
+          listEquals(cast, other.cast) &&
+          listEquals(runs, other.runs) &&
+          averageRating == other.averageRating &&
+          reviewCount == other.reviewCount &&
+          posterImageUrl == other.posterImageUrl;
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    title,
+    description,
+    form,
+    genre,
+    Object.hashAll(creators),
+    Object.hashAll(cast),
+    Object.hashAll(runs),
+    averageRating,
+    reviewCount,
+    posterImageUrl,
+  );
 }

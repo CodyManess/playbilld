@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:playbilld/src/browse_feature/browse_view.dart';
 import 'package:playbilld/src/mock/shows_provider.dart';
 import 'package:playbilld/src/reviews/log_review_sheet.dart';
 import 'package:playbilld/src/reviews/theater_log_controller.dart';
@@ -52,7 +53,7 @@ class DiaryView extends ConsumerWidget {
                       ),
                       const SizedBox(height: 16),
                       FilledButton.icon(
-                        onPressed: () => context.go('/browse'),
+                        onPressed: () => context.go(BrowseView.routeName),
                         icon: const Icon(Icons.search),
                         label: const Text('Find a Show to Log'),
                       ),

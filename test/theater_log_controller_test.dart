@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:playbilld/src/mock/shows_provider.dart';
 import 'package:playbilld/src/models/review.dart';
 import 'package:playbilld/src/models/show.dart';
 import 'package:playbilld/src/reviews/theater_log_controller.dart';
+import 'package:playbilld/src/reviews/theater_log_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -26,6 +29,126 @@ void main() {
       expect(run.statusAt(DateTime(2026, 6, 15)), RunStatus.nowPlaying);
       expect(run.statusAt(DateTime(2026, 8, 2)), RunStatus.closed);
     });
+  });
+
+  group('Model value equality', () {
+    test(
+      'TheaterRun, Show, ShowReview, and BrowseFilterState implement equality',
+      () {
+        final runA = TheaterRun(
+          id: 'r1',
+          productionName: 'Original Run',
+          venue: 'Majestic',
+          city: 'New York',
+          startDate: DateTime(2026, 1, 1),
+        );
+        final runB = TheaterRun(
+          id: 'r1',
+          productionName: 'Original Run',
+          venue: 'Majestic',
+          city: 'New York',
+          startDate: DateTime(2026, 1, 1),
+        );
+        expect(runA, runB);
+        expect(runA.hashCode, runB.hashCode);
+
+        final showA = Show(
+          id: 's1',
+          title: 'Title',
+          description: 'Desc',
+          form: TheaterForm.musical,
+          genre: 'Musical',
+          creators: const ['Creator'],
+          cast: const ['Actor'],
+          runs: [runA],
+          averageRating: 4.5,
+          reviewCount: 10,
+          posterImageUrl: 'https://example.com/a.jpg',
+        );
+        final showB = Show(
+          id: 's1',
+          title: 'Title',
+          description: 'Desc',
+          form: TheaterForm.musical,
+          genre: 'Musical',
+          creators: const ['Creator'],
+          cast: const ['Actor'],
+          runs: [runB],
+          averageRating: 4.5,
+          reviewCount: 10,
+          posterImageUrl: 'https://example.com/a.jpg',
+        );
+        expect(showA, showB);
+        expect(showA.hashCode, showB.hashCode);
+
+        final reviewA = ShowReview(
+          id: 'rev1',
+          showId: 's1',
+          runId: 'r1',
+          runLabel: 'Original Run',
+          authorName: 'You',
+          rating: 4.5,
+          liked: true,
+          body: 'Great',
+          watchedDate: DateTime(2026, 2, 1),
+          createdAt: DateTime(2026, 2, 1),
+          isUserReview: true,
+        );
+        final reviewB = reviewA.copyWith();
+        expect(reviewA, reviewB);
+        expect(reviewA.hashCode, reviewB.hashCode);
+
+        const filterA = BrowseFilterState(
+          query: 'wicked',
+          form: TheaterForm.musical,
+          status: RunStatus.nowPlaying,
+        );
+        const filterB = BrowseFilterState(
+          query: 'wicked',
+          form: TheaterForm.musical,
+          status: RunStatus.nowPlaying,
+        );
+        expect(filterA, filterB);
+        expect(filterA.hashCode, filterB.hashCode);
+      },
+    );
+  });
+
+  group('TheaterLogService resilience', () {
+    test('returns empty reviews when stored JSON is invalid', () async {
+      SharedPreferences.setMockInitialValues({'user_reviews': 'not-json'});
+      final snapshot = await TheaterLogService().load();
+      expect(snapshot.userReviews, isEmpty);
+    });
+
+    test(
+      'skips malformed review entries while preserving valid entries',
+      () async {
+        final validReview = ShowReview(
+          id: 'rev-valid',
+          showId: 'wicked',
+          runId: 'wicked-broadway',
+          runLabel: 'Broadway Open-Ended Run • Gershwin Theatre',
+          authorName: 'You',
+          rating: 4.5,
+          liked: true,
+          body: 'Loved it.',
+          watchedDate: DateTime(2026, 10, 1),
+          createdAt: DateTime(2026, 10, 1),
+          isUserReview: true,
+        );
+
+        SharedPreferences.setMockInitialValues({
+          'user_reviews': jsonEncode([
+            {'id': 'broken', 'rating': 'not-a-number'},
+            validReview.toJson(),
+          ]),
+        });
+
+        final snapshot = await TheaterLogService().load();
+        expect(snapshot.userReviews, [validReview]);
+      },
+    );
   });
 
   group('TheaterLogNotifier & stats', () {

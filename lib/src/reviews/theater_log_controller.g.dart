@@ -89,7 +89,7 @@ final class TheaterLogNotifierProvider
 }
 
 String _$theaterLogNotifierHash() =>
-    r'288e58885d8d321410385cb44d074d903c59c511';
+    r'c986088977ef947f387df6f9091cdf58ce18ab19';
 
 abstract class _$TheaterLogNotifier extends $Notifier<TheaterLogState> {
   TheaterLogState build();

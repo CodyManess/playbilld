@@ -1,0 +1,28 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Riverpod Codegen",
+      "type": "shell",
+      "command": "dart run build_runner build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Flutter Analyze",
+      "type": "shell",
+      "command": "flutter analyze",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Flutter Test",
+      "type": "shell",
+      "command": "flutter test",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    }
+  ]
+}

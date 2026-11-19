@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:playbilld/src/mock/mock_shows.dart';
 import 'package:playbilld/src/models/show.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -75,6 +76,7 @@ List<Show> topRatedShows(Ref ref) {
   return sorted;
 }
 
+@immutable
 class BrowseFilterState {
   final String query;
   final TheaterForm? form;
@@ -93,6 +95,18 @@ class BrowseFilterState {
       status: status != null ? status() : this.status,
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BrowseFilterState &&
+          runtimeType == other.runtimeType &&
+          query == other.query &&
+          form == other.form &&
+          status == other.status;
+
+  @override
+  int get hashCode => Object.hash(query, form, status);
 }
 
 @riverpod

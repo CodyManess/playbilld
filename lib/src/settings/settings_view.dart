@@ -1,9 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:playbilld/src/home_feature/home_view.dart';
+import 'package:playbilld/src/shared/back_or_home_leading.dart';
 
 import 'settings_controller.dart';
 
@@ -19,13 +18,7 @@ class SettingsView extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: context.canPop()
-            ? null
-            : IconButton(
-                tooltip: 'Back to Discover',
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => context.go(HomeView.routeName),
-              ),
+        leading: buildBackOrHomeLeading(context),
         title: const Text('Settings'),
       ),
       body: Center(

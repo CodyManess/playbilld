@@ -58,6 +58,7 @@ class _BrowseViewState extends ConsumerState<BrowseView> {
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                 child: TextField(
                   controller: _searchController,
+                  textInputAction: TextInputAction.search,
                   decoration: InputDecoration(
                     hintText: 'Search shows, venues, creators, or cast...',
                     prefixIcon: const Icon(Icons.search),
@@ -109,7 +110,7 @@ class _BrowseViewState extends ConsumerState<BrowseView> {
                       )
                     : GridView.builder(
                         padding: const EdgeInsets.all(16),
-                        gridDelegate: showPosterGridDelegate,
+                        gridDelegate: showPosterGridDelegateFor(context),
                         itemCount: shows.length,
                         itemBuilder: (context, index) {
                           return ShowPosterCard(show: shows[index]);

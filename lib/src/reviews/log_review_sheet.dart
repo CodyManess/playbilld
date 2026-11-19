@@ -201,7 +201,11 @@ class _LogReviewSheetState extends ConsumerState<_LogReviewSheet> {
                   'Rating: ${_rating.toStringAsFixed(1)} / 5',
                   style: theme.textTheme.titleMedium,
                 ),
-                StarRatingBar(rating: _rating, size: 22),
+                StarRatingBar(
+                  rating: _rating,
+                  size: 22,
+                  excludeSemantics: true,
+                ),
               ],
             ),
             Slider(
@@ -210,6 +214,8 @@ class _LogReviewSheetState extends ConsumerState<_LogReviewSheet> {
               max: 5.0,
               divisions: 9,
               label: _rating.toStringAsFixed(1),
+              semanticFormatterCallback: (value) =>
+                  '${value.toStringAsFixed(1)} out of 5 stars',
               onChanged: (value) {
                 setState(() {
                   _rating = value;

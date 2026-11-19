@@ -3,6 +3,11 @@ analyzer:
     strict-casts: true
     strict-inference: true
     strict-raw-types: true
+  errors:
+    avoid_dynamic_calls: warning
+    cancel_subscriptions: error
+    close_sinks: error
+    unawaited_futures: warning
   exclude:
     - build/**
     - android/**
@@ -17,18 +22,29 @@ plugins:
 
 linter:
   rules:
+    always_declare_return_types: true
     avoid_dynamic_calls: true
     avoid_print: true
     avoid_unnecessary_containers: true
+    avoid_void_async: true
     cancel_subscriptions: true
     close_sinks: true
+    combinators_ordering: true
     directives_ordering: true
+    eol_at_end_of_file: true
+    no_leading_underscores_for_local_identifiers: true
     prefer_const_constructors: true
     prefer_const_declarations: true
     prefer_const_literals_to_create_immutables: true
     prefer_final_locals: true
     prefer_single_quotes: true
     sized_box_for_whitespace: true
+    throw_in_finally: true
     unawaited_futures: true
+    unnecessary_await_in_return: true
+    unnecessary_breaks: true
+    use_enums: true
     use_key_in_widget_constructors: true
+    use_named_constants: true
+    use_string_buffers: true
     use_super_parameters: true

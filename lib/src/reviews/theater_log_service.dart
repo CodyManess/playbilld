@@ -1,8 +1,10 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:playbilld/src/models/review.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+@immutable
 class TheaterLogSnapshot {
   final List<ShowReview> userReviews;
   final Set<String> watchlistIds;
@@ -25,16 +27,7 @@ class TheaterLogService {
     final prefs = await SharedPreferences.getInstance();
 
     final rawReviews = prefs.getString(_reviewsKey);
-    final List<ShowReview> reviews;
-    if (rawReviews == null || rawReviews.isEmpty) {
-      reviews = const [];
-    } else {
-      final decoded = jsonDecode(rawReviews) as List<dynamic>;
-      reviews = decoded
-          .map((item) => ShowReview.fromJson(item as Map<String, dynamic>))
-          .toList();
-    }
-
+    final reviews = _decodeReviews(rawReviews);
     final watchlist = prefs.getStringList(_watchlistKey) ?? const [];
     final likes = prefs.getStringList(_likesKey) ?? const [];
 
@@ -43,6 +36,38 @@ class TheaterLogService {
       watchlistIds: watchlist.toSet(),
       likedShowIds: likes.toSet(),
     );
+  }
+
+  List<ShowReview> _decodeReviews(String? rawReviews) {
+    if (rawReviews == null || rawReviews.isEmpty) {
+      return const [];
+    }
+
+    final Object? decoded;
+    try {
+      decoded = jsonDecode(rawReviews);
+    } on FormatException {
+      return const [];
+    }
+
+    if (decoded is! List<Object?>) {
+      return const [];
+    }
+
+    final reviews = <ShowReview>[];
+    for (final item in decoded) {
+      if (item is! Map<String, dynamic>) {
+        continue;
+      }
+      try {
+        reviews.add(ShowReview.fromJson(item));
+      } on FormatException {
+        continue;
+      } on TypeError {
+        continue;
+      }
+    }
+    return reviews;
   }
 
   Future<void> saveReviews(List<ShowReview> reviews) async {

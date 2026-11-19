@@ -45,7 +45,12 @@ class ReviewCard extends StatelessWidget {
               StarRatingBar(rating: rating, size: 16),
               if (liked) ...[
                 const SizedBox(width: 6),
-                Icon(Icons.favorite, size: 16, color: theme.colorScheme.error),
+                Icon(
+                  Icons.favorite,
+                  size: 16,
+                  semanticLabel: 'Liked',
+                  color: theme.colorScheme.error,
+                ),
               ],
               if (onEdit != null) ...[
                 const SizedBox(width: 4),

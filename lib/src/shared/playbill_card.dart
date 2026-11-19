@@ -17,15 +17,30 @@ const SliverGridDelegateWithMaxCrossAxisExtent showPosterGridDelegate =
       crossAxisSpacing: 12,
     );
 
+/// Text-scale-aware responsive grid layout for [ShowPosterCard] collections.
+SliverGridDelegateWithMaxCrossAxisExtent showPosterGridDelegateFor(
+  BuildContext context,
+) {
+  final scale = MediaQuery.textScalerOf(context).scale(1.0).clamp(1.0, 2.0);
+  return SliverGridDelegateWithMaxCrossAxisExtent(
+    maxCrossAxisExtent: 190,
+    mainAxisExtent: 300 + (scale - 1.0) * 60,
+    mainAxisSpacing: 12,
+    crossAxisSpacing: 12,
+  );
+}
+
 /// Network poster image decoded at display pixel width with a theater fallback.
 class ShowPosterImage extends StatelessWidget {
   final String imageUrl;
   final double logicalWidth;
+  final String? semanticLabel;
 
   const ShowPosterImage({
     super.key,
     required this.imageUrl,
     required this.logicalWidth,
+    this.semanticLabel,
   });
 
   @override
@@ -37,6 +52,8 @@ class ShowPosterImage extends StatelessWidget {
       imageUrl,
       fit: BoxFit.cover,
       cacheWidth: decodeWidth,
+      semanticLabel: semanticLabel,
+      excludeFromSemantics: semanticLabel == null,
       errorBuilder: (context, object, stackTrace) => Center(
         child: Icon(
           Icons.theaters,
@@ -112,6 +129,7 @@ class ShowPosterCard extends ConsumerWidget {
                 child: Icon(
                   isLogged ? Icons.check_circle : Icons.bookmark,
                   size: 16,
+                  semanticLabel: isLogged ? 'Logged' : 'Watchlisted',
                   color: theme.colorScheme.onPrimaryContainer,
                 ),
               ),
@@ -122,72 +140,83 @@ class ShowPosterCard extends ConsumerWidget {
 
     return SizedBox(
       width: width,
-      child: Card(
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: () {
-            unawaited(
-              context.push(ShowDetailView.routeFor(show.id), extra: show),
-            );
-          },
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final hasBoundedHeight = constraints.hasBoundedHeight;
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: hasBoundedHeight
-                    ? MainAxisSize.max
-                    : MainAxisSize.min,
-                children: [
-                  if (hasBoundedHeight)
-                    Expanded(child: posterStack)
-                  else
-                    SizedBox(width: width, height: height, child: posterStack),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          show.title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          primaryRun.venue,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.star,
-                              size: 14,
-                              color: theme.colorScheme.primary,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              effectiveRating.rating.toStringAsFixed(1),
-                              style: theme.textTheme.labelMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+      child: MergeSemantics(
+        child: Card(
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: () {
+              unawaited(
+                context.push(ShowDetailView.routeFor(show.id), extra: show),
               );
             },
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final hasBoundedHeight = constraints.hasBoundedHeight;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: hasBoundedHeight
+                      ? MainAxisSize.max
+                      : MainAxisSize.min,
+                  children: [
+                    if (hasBoundedHeight)
+                      Expanded(child: posterStack)
+                    else
+                      SizedBox(
+                        width: width,
+                        height: height,
+                        child: posterStack,
+                      ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            show.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            primaryRun.venue,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Semantics(
+                            label:
+                                'Rated ${effectiveRating.rating.toStringAsFixed(1)} out of 5',
+                            excludeSemantics: true,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.star,
+                                  size: 14,
+                                  color: theme.colorScheme.primary,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  effectiveRating.rating.toStringAsFixed(1),
+                                  style: theme.textTheme.labelMedium?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
         ),
       ),

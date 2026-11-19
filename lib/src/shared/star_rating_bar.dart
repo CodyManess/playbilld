@@ -4,13 +4,19 @@ import 'package:material_ui/material_ui.dart';
 class StarRatingBar extends StatelessWidget {
   final double rating;
   final double size;
+  final bool excludeSemantics;
 
-  const StarRatingBar({super.key, required this.rating, this.size = 18});
+  const StarRatingBar({
+    super.key,
+    required this.rating,
+    this.size = 18,
+    this.excludeSemantics = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     final color = Theme.of(context).colorScheme.primary;
-    return Row(
+    final row = Row(
       mainAxisSize: MainAxisSize.min,
       children: List.generate(5, (index) {
         final threshold = index + 1;
@@ -24,6 +30,16 @@ class StarRatingBar extends StatelessWidget {
         }
         return Icon(icon, size: size, color: color);
       }),
+    );
+
+    if (excludeSemantics) {
+      return ExcludeSemantics(child: row);
+    }
+
+    return Semantics(
+      label: '${rating.toStringAsFixed(1)} out of 5 stars',
+      excludeSemantics: true,
+      child: row,
     );
   }
 }

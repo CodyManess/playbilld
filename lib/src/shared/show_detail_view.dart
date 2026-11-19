@@ -6,6 +6,7 @@ import 'package:playbilld/src/mock/shows_provider.dart';
 import 'package:playbilld/src/models/show.dart';
 import 'package:playbilld/src/reviews/log_review_sheet.dart';
 import 'package:playbilld/src/reviews/theater_log_controller.dart';
+import 'package:playbilld/src/shared/back_or_home_leading.dart';
 import 'package:playbilld/src/shared/date_formatters.dart';
 import 'package:playbilld/src/shared/playbill_card.dart';
 import 'package:playbilld/src/shared/review_card.dart';
@@ -40,7 +41,10 @@ class ShowDetailView extends ConsumerWidget {
     final overallStatus = show.statusAt(now);
 
     return Scaffold(
-      appBar: AppBar(title: Text(show.title)),
+      appBar: AppBar(
+        leading: buildBackOrHomeLeading(context),
+        title: Text(show.title),
+      ),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1000),
@@ -117,20 +121,26 @@ class ShowDetailView extends ConsumerWidget {
                   subtitle: Text(show.cast.join(', ')),
                 ),
                 const Divider(height: 32),
-                Text(
-                  'Runs & Venues',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
+                Semantics(
+                  header: true,
+                  child: Text(
+                    'Runs & Venues',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
                 for (final run in show.runs)
                   _RunCard(run: run, status: run.statusAt(now)),
                 const Divider(height: 32),
-                Text(
-                  'Reviews (${reviews.length})',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
+                Semantics(
+                  header: true,
+                  child: Text(
+                    'Reviews (${reviews.length})',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -205,6 +215,7 @@ class _ShowHeader extends StatelessWidget {
                 child: ShowPosterImage(
                   imageUrl: show.posterImageUrl,
                   logicalWidth: posterWidth,
+                  semanticLabel: '${show.title} poster',
                 ),
               ),
             ),
@@ -229,17 +240,25 @@ class _ShowHeader extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      StarRatingBar(rating: rating, size: 20),
-                      const SizedBox(width: 8),
-                      Text(
-                        '$rating/5 ($reviewCount)',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
+                  Semantics(
+                    label: 'Rated $rating out of 5 from $reviewCount reviews',
+                    excludeSemantics: true,
+                    child: Row(
+                      children: [
+                        StarRatingBar(
+                          rating: rating,
+                          size: 20,
+                          excludeSemantics: true,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 8),
+                        Text(
+                          '$rating/5 ($reviewCount)',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

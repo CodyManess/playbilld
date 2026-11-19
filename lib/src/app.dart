@@ -41,6 +41,8 @@ class MyApp extends ConsumerWidget {
       // SettingsController to display the correct theme.
       theme: appTheme,
       darkTheme: darkAppTheme,
+      highContrastTheme: highContrastAppTheme,
+      highContrastDarkTheme: highContrastDarkAppTheme,
       themeMode: themeMode,
 
       // Configure routing using go_router.

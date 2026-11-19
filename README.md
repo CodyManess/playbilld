@@ -22,7 +22,7 @@ Letterboxd for Broadway performances — built with Flutter for Android, iOS, an
 
 ```bash
 flutter pub get
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 flutter gen-l10n
 flutter run
 ```
@@ -32,7 +32,8 @@ flutter run
 ```bash
 dart format --output=none --set-exit-if-changed lib test
 flutter analyze
-flutter test
+flutter test --coverage
+flutter build web --wasm
 ```
 
 ## Release Checklist
